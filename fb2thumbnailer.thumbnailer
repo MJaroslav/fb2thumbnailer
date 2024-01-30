@@ -1,0 +1,3 @@
+[Thumbnailer Entry]
+Exec=/usr/local/bin/fb2thumbnailer %u %o %s
+MimeType=application/x-fictionbook+xml;

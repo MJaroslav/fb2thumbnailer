@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import sys
+
+
+from bs4 import BeautifulSoup as BS
+from base64 import b64decode
+from io import BytesIO
+from urllib.parse import urlparse
+from PIL import Image
+
+
+def find_cover_code(fb2):
+    with open(fb2, 'r') as file:
+        content = file.read()
+        soup = BS(content, 'xml')
+        coverpage = soup.find('coverpage')
+        if coverpage:
+            image_id = coverpage.find('image')['l:href']
+            if image_id.startswith('#'):
+                image_id = image_id[1:]
+                source = soup.find('binary', id=image_id)
+                if source and 'content-type' in source.attrs and source['content-type'].startswith('image'):
+                    return source.text
+        binaries = soup.find_all("binary")
+        for binary in binaries:
+            if 'id' in binary and 'cover' in binary['id'] and 'content-type' in binary.attrs and binart['content-type'].startswith('image'):
+                return binary.text
+        for binary in binaries:
+            if 'content-type' in binary.attrs and binary['content-type'].startswith('image'):
+                return binary.text
+    print('No cover images in file')
+
+
+def main():
+    l = len(sys.argv)
+    if l < 3:
+        print('Not enough arguments')
+        sys.exit(1)
+    book_path = urlparse(sys.argv[1]).path
+    thumbnail_path = sys.argv[2]
+    size = int(sys.argv[3]) if l == 4 else 256
+    cover_code = find_cover_code(book_path)
+    if cover_code:
+        cover_bytes = b64decode(cover_code)
+        cover = Image.open(BytesIO(cover_bytes))
+        cover.thumbnail((size, size), Image.ANTIALIAS)
+        cover.save(thumbnail_path, 'PNG')
+
+
+if __name__ == "__main__":
+    main()
+
