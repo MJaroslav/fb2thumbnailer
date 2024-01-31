@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import sys
 
 
@@ -24,7 +23,8 @@ def find_cover_code(fb2):
                     return source.text
         binaries = soup.find_all("binary")
         for binary in binaries:
-            if 'id' in binary and 'cover' in binary['id'] and 'content-type' in binary.attrs and binart['content-type'].startswith('image'):
+            if 'id' in binary and 'cover' in binary['id'] and 'content-type' in binary.attrs and \
+                    binart['content-type'].startswith('image'):
                 return binary.text
         for binary in binaries:
             if 'content-type' in binary.attrs and binary['content-type'].startswith('image'):
@@ -44,6 +44,7 @@ def main():
     if cover_code:
         cover_bytes = b64decode(cover_code)
         cover = Image.open(BytesIO(cover_bytes))
+        if size == 0: size = max(cover.size)
         cover.thumbnail((size, size), Image.ANTIALIAS)
         cover.save(thumbnail_path, 'PNG')
 
